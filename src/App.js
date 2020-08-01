@@ -4,13 +4,12 @@ import Login from './components/Login'
 import Index from './components/Index'
 import './App.css';
 import { Container } from '@material-ui/core'
-import { BrowserRouter as Router, Route, Switch, Redirect, useHistory } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute'
 //import { handleLogout } from './auth-service'
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(localStorage.getItem('auth'))
-  let history = useHistory()
 
 
   const onLogout = () => {
@@ -26,7 +25,7 @@ function App() {
     <div className="App">
         <Router>
         <Navbar isAuthenticated={isAuthenticated}  onClickLogout={onLogout} />
-        <Container maxWidth="sm">
+        <Container maxWidth="sm" style={{ paddingTop: '2rem' }}>
           <Switch>
             <Route path="/login" >
               <Login onLoginSuccessful={onLoginSuccessful}/>

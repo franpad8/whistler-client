@@ -1,5 +1,5 @@
 import React from 'react'
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
 
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
@@ -8,12 +8,17 @@ import CardActions from '@material-ui/core/CardActions';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
+import { Menu, MenuItem } from '@material-ui/core';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
 import { red } from '@material-ui/core/colors';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import ShareIcon from '@material-ui/icons/Share';
+import DeleteIcon from '@material-ui/icons/Delete'
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 import moment from 'moment'
+import { deleteWhistle } from '../api';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -28,9 +33,40 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default ({ text, creatorName, createdAt }) => {
+const StyledMenuItem = withStyles((theme) => ({
+    root: {
+      '&:focus': {
+        backgroundColor: theme.palette.primary.main,
+        '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
+          color: theme.palette.common.white,
+        },
+      },
+    },
+  }))(MenuItem);
+
+export default ({ id, text, creatorName, createdAt, onWhistleDeleted }) => {
 
     const classes = useStyles();
+
+    const [anchorEl, setAnchorEl] = React.useState(null);
+
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const onClickDelete = async () => {
+        handleClose()
+        const { success, error } = await deleteWhistle(id)
+        if (!success) {
+            alert(error)
+            return
+        }
+        onWhistleDeleted()
+    }
 
     return (
     <Card className={classes.root}>
@@ -41,9 +77,36 @@ export default ({ text, creatorName, createdAt }) => {
           </Avatar>
         }
         action={
-          <IconButton aria-label="settings">
-            <MoreVertIcon />
+          <div>
+          <IconButton aria-label="settings" onClick={handleClick} >
+            <MoreVertIcon  />
+            
           </IconButton>
+          <Menu
+                id="customized-menu"
+                anchorEl={anchorEl}
+                keepMounted
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+                elevation={0}
+                getContentAnchorEl={null}
+                anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'center',
+                }}
+                transformOrigin={{
+                vertical: 'top',
+                horizontal: 'center',
+                }}
+          >
+                <StyledMenuItem onClick={ onClickDelete }>
+                    <ListItemIcon>
+                        <DeleteIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText primary="Delete" />
+                </ StyledMenuItem>
+          </ Menu>
+          </div>
         }
         title={`@${creatorName}`}
         subheader={moment(createdAt).calendar()}

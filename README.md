@@ -1,4 +1,4 @@
-FRONTEND OF TWITTER-LIKE APPLICATION WHISTLER
+## FRONTEND OF TWITTER-LIKE APPLICATION WHISTLER
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 

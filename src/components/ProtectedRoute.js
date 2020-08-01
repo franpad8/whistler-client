@@ -1,5 +1,4 @@
 import React from 'react'
-import {useEffect} from 'react'
 import {  Route, Redirect } from 'react-router-dom'
 
 //import { isLoggedIn } from '../auth-service'

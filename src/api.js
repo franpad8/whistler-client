@@ -18,42 +18,77 @@ export const authenticate = async (email, password) => {
         return { success: true, token: response.data.token }
 
     } catch(error) {
-        let message = 'An error ocurred trying to signing in. Please try later.'
-        if (error.response) {
-            const status = error.response.status
-            if ([401, 422].includes(status)) {
-                message = error.response.data.error
-            }
-        }
-        return { success: false, message }
+        let defaultMessageError = 'An error ocurred trying to signing in. Please try later.'
+        return buildErrorResponse(error, [401, 422], defaultMessageError)
     }
 }
+
+export const addNewWhistle = async text => {
+    try{
+        const response = await axios.post(
+            'http://localhost:3001/whistles/', 
+            {
+                text
+            },
+            {
+                headers: buildHeaderWithToken()
+            }
+        )
+        return { success: true, data: response.data }
+
+    } catch(error) {
+        let defaultMessageError = 'An error ocurred trying to adding the whistle. Please try later.'
+        return buildErrorResponse(error, [401, 422], defaultMessageError)
+    }
+}
+
+export const deleteWhistle = async id => {
+    try{
+        const response = await axios.delete(
+            `http://localhost:3001/whistles/${id}`, 
+            {
+                headers: buildHeaderWithToken()
+            }
+        )
+        return { success: true, data: response.data }
+
+    } catch(error) {
+        let defaultMessageError = 'An error ocurred deleting the whistle. Please try later.'
+        return buildErrorResponse(error, [401, 403, 404, 422], defaultMessageError)
+    }
+}
+
 
 export const fetchTimeline = async () => {
     try {
         const response = await axios.get(
             'http://localhost:3001/whistles', 
             {
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('auth')}`
-                }
+                headers: buildHeaderWithToken()
             }
         )
         console.log(response)
         return { success: true, data: response.data }
 
     } catch(error) {
-        let messageError = 'An error ocurred trying to fetch the timeline data'
-        if (error.response) {
-            const status = error.response.status
-            if ([401, 403].includes(status)) {
-                messageError = error.response.data.error
-            }
-        }
-        return { success: false, error: messageError }
+        let defaultMessageError = 'An error ocurred trying to fetch the timeline data'
+        return buildErrorResponse(error, [401, 403], defaultMessageError)
     }
 
 }
 
+const buildHeaderWithToken = () => ({
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${localStorage.getItem('auth')}`
+})
+
+function buildErrorResponse(error, expectedErrors, messageError) {
+        if (error.response) {
+            const status = error.response.status
+            if (expectedErrors.includes(status)) {
+                messageError = error.response.data.error
+            }
+        }
+        return { success: false, error: messageError }
+}
