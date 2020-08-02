@@ -1,63 +1,89 @@
 import React from 'react'
 import { useEffect, useState, createRef } from 'react'
 import { TextField, Button, Icon } from '@material-ui/core';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
-import { fetchTimeline, addNewWhistle } from '../api'
+import { fetchTimeline, addNewWhistle, deleteWhistle } from '../api'
 import Whistle from './Whistle'
 
 export default () => {
     const [ whistleList, setWhistlesList ] = useState([])
-    const [ canLoadMore, setCanLoadMore ] = useState(true)
+    const [ canLoadMore, setCanLoadMore ] = useState(false)
+    const [ loading, setLoading ] = useState(true)
+    const [ loadingMore, setLoadingMore ] = useState(false)
     let newWhistleElemTextField = createRef()
 
 
     const onClickAddNewWhistle = async () => {
-        const text = newWhistleElemTextField.current.querySelector('textarea').value
+        setLoading(true)
+        setCanLoadMore(false)
+        const textAreaElem = newWhistleElemTextField.current.querySelector('textarea')
+        const text = textAreaElem.value
         if (!text) {
             alert('Cannot send empty text')
         }
 
         const { success, data, message }  = await addNewWhistle(text)
 
-        if (!success) {
-            alert(message)
-            return
-        }
+        if (success) {
+            const lastWhistleId = whistleList[whistleList.length - 1].whistleId
+            fetchData({ untilId: lastWhistleId })
+            textAreaElem.value = ''
 
-        const lastWhistleId = whistleList[whistleList.length - 1].whistleId
-        fetchData({ untilId: lastWhistleId })
+        } else {
+            alert(message)
+        }
     }
 
     async function fetchData({ untilId }={}) {
         const { success, data, error } = await fetchTimeline({ untilId })
-        if (!success) {
+        if (success) {
+            if (data.whistles.length === 0) {
+                setCanLoadMore(false)
+            } else {
+                setCanLoadMore(true)
+            }
+            setWhistlesList(data.whistles)
+        } else {
             alert(error)
-            return ''
         }
-        if (data.whistles.length === 0) {
-            setCanLoadMore(false)
-        }
-        setWhistlesList(data.whistles)
+        
+        setLoading(false)
     }
 
     async function fetchMoreData() {
-        console.log(whistleList)
+        setLoadingMore(true)
         const lastWhistleId = whistleList[whistleList.length - 1].whistleId
         const { success, data, error } = await fetchTimeline({ afterId: lastWhistleId })
-        if (!success) {
+        if (success) {
+            setWhistlesList((current) => {
+                return current.concat(data.whistles)      
+            })
+            if (data.whistles.length === 0) {
+                setCanLoadMore(false)
+            } else {
+                setCanLoadMore(true)
+            }
+
+        } else {       
             alert(error)
-            return ''
         }
-        
-        setWhistlesList((current) => {
-            return current.concat(data.whistles)
-            
-        })
+        setLoadingMore(false)
     }
 
-    const onWhistleDeleted = () => {
-        const lastWhistleId = whistleList[whistleList.length - 1].whistleId
-        fetchData({ untilId: lastWhistleId })
+    const onWhistleDeleted = async (id) => {
+        setLoading(true)
+        setCanLoadMore(false)
+
+        const { success, error } = await deleteWhistle(id)
+        if (success) {
+            const lastWhistleId = whistleList[whistleList.length - 1].whistleId
+            fetchData({ untilId: lastWhistleId })
+        } else {
+            alert(error)
+            setLoading(false)
+            setCanLoadMore(true)
+        }   
     }
 
     const onClickLoadMoreButton = () => {
@@ -88,22 +114,31 @@ export default () => {
             Send
             </Button>
         </div>
-        {whistleList.map(whistle => {
-            return (
-                <Whistle 
-                    key={whistle.whistleId}
-                    id={whistle.whistleId}
-                    text={whistle.text}
-                    creatorName={whistle.creatorId.username}
-                    createdAt={whistle.createdAt}
-                    onWhistleDeleted={onWhistleDeleted}
-                />
-            )
-        })}
+
+        {
+        loading 
+            ?  <CircularProgress style={{ marginTop: '2rem' }} color="inherit" size="1.5rem"/>
+            :  whistleList.map(whistle => {
+                return (
+                    <Whistle 
+                        key={whistle.whistleId}
+                        id={whistle.whistleId}
+                        text={whistle.text}
+                        creatorName={whistle.creatorId.username}
+                        createdAt={whistle.createdAt}
+                        onWhistleDeleted={onWhistleDeleted}
+                    />
+                )
+            })
+        }
         {
         canLoadMore 
-            ?  <Button variant="contained" color="primary" disableElevation onClick={onClickLoadMoreButton}>
-                    Load more
+            ?  <Button style={{ minWidth: '7.5rem' }} variant="contained" color="primary" disableElevation onClick={onClickLoadMoreButton}>
+                    {
+                        loadingMore 
+                            ? <CircularProgress color="inherit" size="1.5rem"/>
+                            : 'Load more'
+                    }
                 </Button>
             : null
         }

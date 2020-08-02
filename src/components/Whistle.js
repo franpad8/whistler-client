@@ -18,7 +18,6 @@ import DeleteIcon from '@material-ui/icons/Delete'
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 import moment from 'moment'
-import { deleteWhistle } from '../api';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -60,12 +59,7 @@ export default ({ id, text, creatorName, createdAt, onWhistleDeleted }) => {
 
     const onClickDelete = async () => {
         handleClose()
-        const { success, error } = await deleteWhistle(id)
-        if (!success) {
-            alert(error)
-            return
-        }
-        onWhistleDeleted()
+        onWhistleDeleted(id)
     }
 
     return (
