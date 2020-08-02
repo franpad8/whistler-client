@@ -26,7 +26,11 @@ export default () => {
         const { success, data, message }  = await addNewWhistle(text)
 
         if (success) {
-            const lastWhistleId = whistleList[whistleList.length - 1].whistleId
+            const lastWhistle = whistleList[whistleList.length - 1]
+            let lastWhistleId
+            if (lastWhistle) {
+                lastWhistleId = lastWhistle.whistleId
+            }
             fetchData({ untilId: lastWhistleId })
             textAreaElem.value = ''
 
