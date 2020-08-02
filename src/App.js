@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Container } from '@material-ui/core'
-import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Switch, Redirect} from 'react-router-dom'
 
 import ProtectedRoute from './components/ProtectedRoute'
 import Navbar from './components/Navbar'
@@ -11,6 +11,8 @@ import './App.css';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(localStorage.getItem('auth'))
+  const [searchText, setSearchText] = useState('')
+
 
 
   const onLogout = () => {
@@ -22,10 +24,15 @@ function App() {
     setIsAuthenticated(true)
   }
 
+  const onSearch = text => {
+    window.history.replaceState({}, '', `/search?text=${text}`)
+    setSearchText(text)
+  }
+
   return (
     <div className="App">
         <Router>
-        <Navbar isAuthenticated={isAuthenticated}  onClickLogout={onLogout} />
+        <Navbar isAuthenticated={isAuthenticated}  onClickLogout={onLogout} onSearch={onSearch} />
         <Container maxWidth="sm" style={{ paddingTop: '2rem' }}>
           <Switch>
             <Route path="/login" >
@@ -34,7 +41,7 @@ function App() {
             <Route path="/logout" >
               <Redirect to="/login" />
             </Route>
-            <ProtectedRoute path="/search" component={Search}/>
+            <ProtectedRoute path="/search" component={Search} searchText={searchText}/>
             <ProtectedRoute path="/" component={Index} />
           </Switch>
           </Container>

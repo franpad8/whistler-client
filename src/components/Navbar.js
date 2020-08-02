@@ -26,9 +26,6 @@ const useStyles = makeStyles((theme) => ({
       display: 'block',
     },
   },
-  menuButton: {
-    marginRight: theme.spacing(2),
-  },
   search: {
     position: 'relative',
     borderRadius: theme.shape.borderRadius,
@@ -70,7 +67,7 @@ const useStyles = makeStyles((theme) => ({
 
 
 
-export default function ButtonAppBar({isAuthenticated, onClickLogout}) {
+export default function ButtonAppBar({isAuthenticated, onClickLogout, onSearch}) {
   const classes = useStyles();
   let history = useHistory()
 
@@ -85,7 +82,7 @@ export default function ButtonAppBar({isAuthenticated, onClickLogout}) {
   const onKeyPressedSearch = (event) => {
     const searchText = event.target.value
     if (event.key === 'Enter' && searchText.length > 0){
-        window.location = `search?text=${searchText}`
+        onSearch(searchText)
     }
   }
 

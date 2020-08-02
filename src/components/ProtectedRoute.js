@@ -10,8 +10,7 @@ const ProtectedRoute = ({component: Component, ...rest}) => {
         if (!localStorage.getItem('auth')) {
               return <Redirect to='/login' />
         }
-
-        return <Component {...props} />
+        return <Component {...props} {...rest} />
 
     }} />
 

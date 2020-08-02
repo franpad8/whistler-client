@@ -1,20 +1,17 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { useEffect, useState } from 'react'
 import CircularProgress from '@material-ui/core/CircularProgress';
-import queryString from 'query-string'
 
 import { fetchWhistlesByText, deleteWhistle } from '../api'
 import Whistle from '../components/Whistle'
 
-export default (props) => {
+export default ({ searchText }) => {
     const [ whistleList, setWhistlesList ] = useState([])
     const [ loading, setLoading ] = useState(true)
 
 
-    async function fetchData() {
-        const params = queryString.parse(props.location.search)
-        console.log(params)
-        const { success, data, error } = await fetchWhistlesByText(params.text)
+    const fetchData = useCallback(async () => {
+        const { success, data, error } = await fetchWhistlesByText(searchText)
         if (success) {
             setWhistlesList(data.whistles)
         } else {
@@ -22,7 +19,7 @@ export default (props) => {
         }
         
         setLoading(false)
-    }
+    }, [searchText])
 
     const onWhistleDeleted = async (id) => {
         setLoading(true)
@@ -39,7 +36,7 @@ export default (props) => {
 
     useEffect(() => {
         fetchData()
-    }, [])
+    }, [searchText, fetchData])
 
     return <div>
         {

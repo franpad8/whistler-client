@@ -23,7 +23,7 @@ export default () => {
             alert('Cannot send empty text')
         }
 
-        const { success, data, message }  = await addNewWhistle(text)
+        const { success, message }  = await addNewWhistle(text)
 
         if (success) {
             const lastWhistle = whistleList[whistleList.length - 1]
