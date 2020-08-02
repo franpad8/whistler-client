@@ -59,10 +59,17 @@ export const deleteWhistle = async id => {
 }
 
 
-export const fetchTimeline = async () => {
+export const fetchTimeline = async ({ afterId, untilId } = {}) => {
     try {
+        let url = 'http://localhost:3001/whistles'
+        if (untilId) {
+            url = `${url}?untilId=${untilId}`
+        } 
+        else if (afterId) {
+            url = `${url}?afterId=${afterId}`
+        } 
         const response = await axios.get(
-            'http://localhost:3001/whistles', 
+            url, 
             {
                 headers: buildHeaderWithToken()
             }

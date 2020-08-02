@@ -7,6 +7,7 @@ import Whistle from './Whistle'
 
 export default () => {
     const [ whistleList, setWhistlesList ] = useState([])
+    const [ canLoadMore, setCanLoadMore ] = useState(true)
     let newWhistleElemTextField = createRef()
 
 
@@ -23,21 +24,44 @@ export default () => {
             return
         }
 
-        fetchData()
+        const lastWhistleId = whistleList[whistleList.length - 1].whistleId
+        fetchData({ untilId: lastWhistleId })
     }
 
-    async function fetchData() {
-        const { success, data, error } = await fetchTimeline()
+    async function fetchData({ untilId }={}) {
+        const { success, data, error } = await fetchTimeline({ untilId })
         if (!success) {
             alert(error)
             return ''
         }
-        console.log(data.whistles)
+        if (data.whistles.length === 0) {
+            setCanLoadMore(false)
+        }
         setWhistlesList(data.whistles)
     }
 
+    async function fetchMoreData() {
+        console.log(whistleList)
+        const lastWhistleId = whistleList[whistleList.length - 1].whistleId
+        const { success, data, error } = await fetchTimeline({ afterId: lastWhistleId })
+        if (!success) {
+            alert(error)
+            return ''
+        }
+        
+        setWhistlesList((current) => {
+            return current.concat(data.whistles)
+            
+        })
+    }
+
     const onWhistleDeleted = () => {
-        fetchData()
+        const lastWhistleId = whistleList[whistleList.length - 1].whistleId
+        fetchData({ untilId: lastWhistleId })
+    }
+
+    const onClickLoadMoreButton = () => {
+        fetchMoreData()
     }
 
     useEffect(() => {
@@ -76,5 +100,12 @@ export default () => {
                 />
             )
         })}
+        {
+        canLoadMore 
+            ?  <Button variant="contained" color="primary" disableElevation onClick={onClickLoadMoreButton}>
+                    Load more
+                </Button>
+            : null
+        }
     </div>
 }
