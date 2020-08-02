@@ -84,6 +84,25 @@ export const fetchTimeline = async ({ afterId, untilId } = {}) => {
 
 }
 
+export const fetchWhistlesByText = async (searchText) => {
+    try {
+        let url = `http://localhost:3001/whistles/search?text=${searchText}` 
+        const response = await axios.get(
+            url, 
+            {
+                headers: buildHeaderWithToken()
+            }
+        )
+        console.log(response)
+        return { success: true, data: response.data }
+
+    } catch(error) {
+        let defaultMessageError = 'An error ocurred trying to fetch the timeline data'
+        return buildErrorResponse(error, [401, 403], defaultMessageError)
+    }
+
+}
+
 const buildHeaderWithToken = () => ({
     'Accept': 'application/json',
     'Content-Type': 'application/json',

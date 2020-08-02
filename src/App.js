@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import Navbar from './components/Navbar'
-import Login from './components/Login'
-import Index from './components/Index'
-import './App.css';
 import { Container } from '@material-ui/core'
 import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom'
+
 import ProtectedRoute from './components/ProtectedRoute'
-//import { handleLogout } from './auth-service'
+import Navbar from './components/Navbar'
+import Login from './pages/Login'
+import Index from './pages/Index'
+import Search from './pages/Search';
+import './App.css';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(localStorage.getItem('auth'))
@@ -33,6 +34,7 @@ function App() {
             <Route path="/logout" >
               <Redirect to="/login" />
             </Route>
+            <ProtectedRoute path="/search" component={Search}/>
             <ProtectedRoute path="/" component={Index} />
           </Switch>
           </Container>

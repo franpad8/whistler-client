@@ -4,7 +4,7 @@ import { TextField, Button, Icon } from '@material-ui/core';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { fetchTimeline, addNewWhistle, deleteWhistle } from '../api'
-import Whistle from './Whistle'
+import Whistle from '../components/Whistle'
 
 export default () => {
     const [ whistleList, setWhistlesList ] = useState([])
@@ -123,12 +123,13 @@ export default () => {
         loading 
             ?  <CircularProgress style={{ marginTop: '2rem' }} color="inherit" size="1.5rem"/>
             :  whistleList.map(whistle => {
+                const creator = whistle.creatorId
                 return (
                     <Whistle 
                         key={whistle.whistleId}
                         id={whistle.whistleId}
                         text={whistle.text}
-                        creatorName={whistle.creatorId.username}
+                        creatorName={creator ? creator.username : 'Deleted User'}
                         createdAt={whistle.createdAt}
                         onWhistleDeleted={onWhistleDeleted}
                     />
