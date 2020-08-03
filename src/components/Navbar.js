@@ -8,7 +8,7 @@ import IconButton from '@material-ui/core/IconButton';
 import SearchIcon from '@material-ui/icons/Search';
 import MenuIcon from '@material-ui/icons/Menu';
 import InputBase from '@material-ui/core/InputBase';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -21,10 +21,11 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(2),
   },
   title: {
-    display: 'none',
-    [theme.breakpoints.up('sm')]: {
-      display: 'block',
-    },
+    marginRight: theme.spacing(2),
+
+    // [theme.breakpoints.up('sm')]: {
+    //   display: 'block',
+    // },
   },
   search: {
     position: 'relative',
@@ -82,6 +83,7 @@ export default function ButtonAppBar({isAuthenticated, onClickLogout, onSearch})
   const onKeyPressedSearch = (event) => {
     const searchText = event.target.value
     if (event.key === 'Enter' && searchText.length > 0){
+        history.push(`/search`)
         onSearch(searchText)
     }
   }
@@ -90,10 +92,7 @@ export default function ButtonAppBar({isAuthenticated, onClickLogout, onSearch})
     <div className={classes.root}>
       <AppBar position="static">
         <Toolbar>
-          <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" className={classes.title}>
+          <Typography variant="h7" className={classes.title} onClick={() => {history.push('/')}}>
             Whistler
           </Typography>
           <div className={classes.search}>

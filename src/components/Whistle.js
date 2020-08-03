@@ -15,6 +15,8 @@ import { red } from '@material-ui/core/colors';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import ShareIcon from '@material-ui/icons/Share';
 import DeleteIcon from '@material-ui/icons/Delete'
+import PersonAddIcon from '@material-ui/icons/PersonAdd'
+import PersonAddDisabledIcon from '@material-ui/icons/PersonAddDisabled'
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 import moment from 'moment'
@@ -43,7 +45,7 @@ const StyledMenuItem = withStyles((theme) => ({
     },
   }))(MenuItem);
 
-export default ({ id, text, creatorName, createdAt, onWhistleDeleted }) => {
+export default ({ id, text, creatorName, createdAt, onWhistleDeleted, onFollow, onUnfollow, creatorId }) => {
 
     const classes = useStyles();
 
@@ -57,9 +59,18 @@ export default ({ id, text, creatorName, createdAt, onWhistleDeleted }) => {
         setAnchorEl(null);
     };
 
-    const onClickDelete = async () => {
+    const onClickDelete = () => {
         handleClose()
         onWhistleDeleted(id)
+    }
+
+    const onClickFollow = () => {
+        handleClose()
+        onFollow(creatorId)
+    }
+
+    const onClickUnfollow = () => {
+        onUnfollow(creatorId)
     }
 
     return (
@@ -98,6 +109,18 @@ export default ({ id, text, creatorName, createdAt, onWhistleDeleted }) => {
                         <DeleteIcon fontSize="small" />
                     </ListItemIcon>
                     <ListItemText primary="Delete" />
+                </ StyledMenuItem>
+                <StyledMenuItem onClick={ onClickFollow }>
+                    <ListItemIcon>
+                        <PersonAddIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText primary="Follow" />
+                </ StyledMenuItem>
+                <StyledMenuItem onClick={ onClickUnfollow }>
+                    <ListItemIcon>
+                        <PersonAddDisabledIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText primary="Unfollow" />
                 </ StyledMenuItem>
           </ Menu>
           </div>

@@ -2,7 +2,7 @@ import React, { useCallback } from 'react'
 import { useEffect, useState } from 'react'
 import CircularProgress from '@material-ui/core/CircularProgress';
 
-import { fetchWhistlesByText, deleteWhistle } from '../api'
+import { fetchWhistlesByText, deleteWhistle, followUser, unfollowUser } from '../api'
 import Whistle from '../components/Whistle'
 
 export default ({ searchText }) => {
@@ -34,6 +34,32 @@ export default ({ searchText }) => {
         }   
     }
 
+    const onUnfollow = async (id) => {
+        setLoading(true)
+
+        const { success, error } = await unfollowUser(id)
+        if (success) {
+            const lastWhistleId = whistleList[whistleList.length - 1].whistleId
+            fetchData({ untilId: lastWhistleId })
+        } else {
+            alert(error)
+            setLoading(false)
+        }   
+    }
+
+    const onFollow = async (id) => {
+        setLoading(true)
+
+        const { success, error } = await followUser(id)
+        if (success) {
+            const lastWhistleId = whistleList[whistleList.length - 1].whistleId
+            fetchData({ untilId: lastWhistleId })
+        } else {
+            alert(error)
+            setLoading(false)
+        }   
+    }
+
     useEffect(() => {
         fetchData()
     }, [searchText, fetchData])
@@ -52,6 +78,9 @@ export default ({ searchText }) => {
                         creatorName={creator ? creator.username : 'Deleted User'}
                         createdAt={whistle.createdAt}
                         onWhistleDeleted={onWhistleDeleted}
+                        onFollow={onFollow}
+                        onUnfollow={onUnfollow}
+                        creatorId={creator ? creator._id: null}
                     />
                 )
             })

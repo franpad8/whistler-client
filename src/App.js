@@ -13,8 +13,6 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(localStorage.getItem('auth'))
   const [searchText, setSearchText] = useState('')
 
-
-
   const onLogout = () => {
     localStorage.removeItem('auth')
     setIsAuthenticated(false)
@@ -25,7 +23,6 @@ function App() {
   }
 
   const onSearch = text => {
-    window.history.replaceState({}, '', `/search?text=${text}`)
     setSearchText(text)
   }
 
